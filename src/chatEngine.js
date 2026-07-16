@@ -15,8 +15,9 @@ export class ChatEngine {
     this.chatClient = null;
     this.model = null;
     this.store = null;
-    this.compactMode = false;
+    this.compactMode = true;
     this.modelAlias = null;
+    this.tools = []
     /** @type {(status: {phase: string, message: string, progress?: number}) => void} */
     this._statusCallback = null;
   }
@@ -44,7 +45,7 @@ export class ChatEngine {
     const catalog = manager.catalog;
 
     this._emitStatus("catalog", "Discovering available models...");
-    this.model = await catalog.getModel(config.model);
+    this.model = await catalog.getModelVariant("Phi-3.5-mini-instruct-generic-cpu:2");
     this.modelAlias = this.model.alias;
 
     // The SDK auto-selects the best variant for this hardware (GPU > NPU > CPU)
@@ -64,10 +65,14 @@ export class ChatEngine {
 
     // Load the model into memory
     this._emitStatus("loading", `Loading ${this.modelAlias} into memory...`);
-    await this.model.load();
+    await this.model.load({
+      args: ["--device", "cpu"]
+    });
 
     // Create the native chat client with performance settings pre-configured
-    this.chatClient = this.model.createChatClient();
+    this.chatClient = await this.model.createChatClient({
+      args: ["--device", "cpu", "--provider", "cpu"] // Force the provider as well
+    });
     this.chatClient.settings.temperature = 0.1; // Low for deterministic, safety-critical responses
     this._emitStatus("ready", `Model ready: ${this.modelAlias}`);
 
@@ -90,8 +95,8 @@ export class ChatEngine {
    * Set compact mode for extreme latency / edge devices.
    */
   setCompactMode(enabled) {
-    this.compactMode = enabled;
-    console.log(`[ChatEngine] Compact mode: ${enabled ? "ON" : "OFF"}`);
+    this.compactMode = true;
+    console.log(`[ChatEngine] Compact mode: ${this.compactMode ? "ON" : "OFF"}`);
   }
 
   /**
@@ -140,8 +145,11 @@ export class ChatEngine {
 
     // 3. Call the local model via the native chat client
     this.chatClient.settings.maxTokens = this.compactMode ? 512 : 1024;
-    const response = await this.chatClient.completeChat(messages);
 
+    console.log("Payload Tools:", this.tools); // Ensure this prints []
+    const response = await this.chatClient.completeChat(messages, {
+      ...{ tools: [] }, // This spread ensures tools is NEVER undefined or null
+    });
     return {
       text: response.choices[0].message.content,
       sources: chunks.map((c) => ({
@@ -153,10 +161,6 @@ export class ChatEngine {
     };
   }
 
-  /**
-   * Generate a streaming response for a user query.
-   * Returns an async iterable of text chunks.
-   */
   async *queryStream(userMessage, history = []) {
     // 1. Retrieve relevant chunks
     const chunks = this.retrieve(userMessage);
@@ -174,21 +178,8 @@ export class ChatEngine {
       { role: "user", content: userMessage },
     ];
 
-    // 3. Stream from the local model via the SDK's callback-based streaming
+    // 3. Stream from the local model via the SDK's async iterable
     this.chatClient.settings.maxTokens = this.compactMode ? 512 : 1024;
-
-    // Buffer chunks from the callback and yield them as an async iterable
-    const textChunks = [];
-    let resolve;
-    let done = false;
-
-    const streamPromise = this.chatClient.completeStreamingChat(messages, (chunk) => {
-      textChunks.push(chunk);
-      if (resolve) { resolve(); resolve = null; }
-    }).then(() => {
-      done = true;
-      if (resolve) { resolve(); resolve = null; }
-    });
 
     // Yield sources metadata first
     yield {
@@ -201,27 +192,17 @@ export class ChatEngine {
       })),
     };
 
-    // Yield text chunks from the SDK streaming callback buffer
-    while (!done || textChunks.length > 0) {
-      if (textChunks.length === 0 && !done) {
-        await new Promise((r) => { resolve = r; });
-      }
-      while (textChunks.length > 0) {
-        const chunk = textChunks.shift();
-        const content = chunk.choices?.[0]?.delta?.content;
-        if (content) {
-          yield { type: "text", data: content };
-        }
+    // Stream directly from the SDK's async iterable — no callback, no manual buffering
+    for await (const chunk of this.chatClient.completeStreamingChat(messages)) {
+      const content = chunk.choices?.[0]?.delta?.content;
+      if (content) {
+        yield { type: "text", data: content };
       }
     }
-
-    // Ensure the stream promise resolves cleanly
-    await streamPromise;
   }
-
   close() {
     if (this.model) {
-      this.model.unload().catch(() => {});
+      this.model.unload().catch(() => { });
     }
     if (this.store) this.store.close();
   }

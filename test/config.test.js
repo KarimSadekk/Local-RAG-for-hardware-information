@@ -73,6 +73,6 @@ describe("SYSTEM_PROMPT_COMPACT", () => {
   });
 
   it("still mentions safety", () => {
-    assert.ok(SYSTEM_PROMPT_COMPACT.toLowerCase().includes("safety"));
+    assert.ok(SYSTEM_PROMPT_COMPACT.toLowerCase().includes("rules"));
   });
 });

@@ -1,0 +1,67 @@
+{"id": 7, "text": "Radeon 9800 PRO 256-bit"}
+{"id": 50, "text": "Radeon 9700 PRO"}
+{"id": 79, "text": "GeForce FX 5950 Ultra"}
+{"id": 147, "text": "Radeon X1900 XTX"}
+{"id": 154, "text": "GeForce 7900 GTX"}
+{"id": 178, "text": "GeForce4 Ti 4600"}
+{"id": 187, "text": "GeForce 8800 GTX"}
+{"id": 192, "text": "Radeon HD 2900 XT"}
+{"id": 219, "text": "Radeon HD 4870"}
+{"id": 238, "text": "GeForce GTX 285"}
+{"id": 253, "text": "Radeon HD 5870"}
+{"id": 268, "text": "GeForce GTX 480"}
+{"id": 270, "text": "GeForce GTX 580"}
+{"id": 296, "text": "Radeon HD 7970"}
+{"id": 342, "text": "GeForce GTX 680"}
+{"id": 720, "text": "GeForce 6800 Ultra"}
+{"id": 734, "text": "GeForce 256 DDR"}
+{"id": 736, "text": "GeForce2 Ultra"}
+{"id": 741, "text": "GeForce3 Ti500"}
+{"id": 2460, "text": "Radeon R9 290X"}
+{"id": 2512, "text": "GeForce GTX 780 Ti"}
+{"id": 2620, "text": "GeForce GTX 970"}
+{"id": 2724, "text": "GeForce GTX 980 Ti"}
+{"id": 2848, "text": "Radeon RX 480"}
+{"id": 2862, "text": "GeForce GTX 1060 6 GB"}
+{"id": 2871, "text": "Radeon RX Vega 64"}
+{"id": 2877, "text": "GeForce GTX 1080 Ti"}
+{"id": 2938, "text": "Radeon RX 580"}
+{"id": 3224, "text": "GeForce RTX 2080"}
+{"id": 3305, "text": "GeForce RTX 2080 Ti"}
+{"id": 3339, "text": "Radeon RX 5700 XT"}
+{"id": 3621, "text": "GeForce RTX 3080"}
+{"id": 3622, "text": "GeForce RTX 3090"}
+{"id": 3674, "text": "GeForce RTX 3070"}
+{"id": 3737, "text": "Iris Xe MAX Graphics"}
+{"id": 3839, "text": "Radeon RX 7800 XT"}
+{"id": 3888, "text": "GeForce RTX 4080"}
+{"id": 3889, "text": "GeForce RTX 4090"}
+{"id": 3890, "text": "GeForce RTX 4060 Ti 8 GB"}
+{"id": 3911, "text": "Radeon RX 7700 XT"}
+{"id": 3912, "text": "Radeon RX 7900 XT"}
+{"id": 3914, "text": "Arc A770"}
+{"id": 3924, "text": "GeForce RTX 4070"}
+{"id": 3941, "text": "Radeon RX 7900 XTX"}
+{"id": 3950, "text": "GeForce RTX 4070 Ti"}
+{"id": 4107, "text": "GeForce RTX 4060"}
+{"id": 4153, "text": "Radeon RX 7600"}
+{"id": 4155, "text": "GeForce RTX 4060 Ti 16 GB"}
+{"id": 4166, "text": "Radeon RX 7900 GRE"}
+{"id": 4182, "text": "GeForce RTX 4080 SUPER"}
+{"id": 4186, "text": "GeForce RTX 4070 SUPER"}
+{"id": 4187, "text": "GeForce RTX 4070 Ti SUPER"}
+{"id": 4190, "text": "Radeon RX 7600 XT"}
+{"id": 4216, "text": "GeForce RTX 5090"}
+{"id": 4217, "text": "GeForce RTX 5080"}
+{"id": 4218, "text": "GeForce RTX 5070"}
+{"id": 4219, "text": "GeForce RTX 5060"}
+{"id": 4220, "text": "GeForce RTX 5050"}
+{"id": 4229, "text": "Radeon RX 9070 XT"}
+{"id": 4243, "text": "GeForce RTX 5070 Ti"}
+{"id": 4244, "text": "Arc B580"}
+{"id": 4246, "text": "GeForce RTX 5060 Ti 8 GB"}
+{"id": 4250, "text": "Radeon RX 9070"}
+{"id": 4251, "text": "Radeon RX 9060 XT 8 GB"}
+{"id": 4292, "text": "GeForce RTX 5060 Ti 16 GB"}
+{"id": 4293, "text": "Radeon RX 9060 XT 16 GB"}
+{"id": null, "text": null}
