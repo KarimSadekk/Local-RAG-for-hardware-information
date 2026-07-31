@@ -6,22 +6,38 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import helmet from "helmet"; // Make sure helmet is imported at the top!
 import { config } from "./config.js";
 import { ChatEngine } from "./chatEngine.js";
 import { parseFrontMatter, chunkText } from "./chunker.js";
 
 const app = express();
 
-// ── Security headers ──
+// Single unified Helmet configuration including CDN and Hugging Face allowances
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net"], // 👈 Added 'unsafe-eval' here
+      connectSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net",
+        "https://huggingface.co",
+        "https://*.huggingface.co",
+        "https://*.aws.cdn.hf.co"
+      ],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+    },
+  })
+);
+
+// Other safe security headers (removed the duplicate manual CSP header string)
 app.use((_req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Referrer-Policy", "no-referrer");
   res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
-  );
   next();
 });
 

@@ -9,6 +9,7 @@ import { FoundryLocalManager } from "foundry-local-sdk";
 import { VectorStore } from "./vectorStore.js";
 import { config } from "./config.js";
 import { SYSTEM_PROMPT, SYSTEM_PROMPT_COMPACT } from "./prompts.js";
+import { pipeline } from '@huggingface/transformers';
 
 export class ChatEngine {
   constructor() {
@@ -66,12 +67,12 @@ export class ChatEngine {
     // Load the model into memory
     this._emitStatus("loading", `Loading ${this.modelAlias} into memory...`);
     await this.model.load({
-      args: ["--device", "cpu"]
+      args: ["--device", "gpu"]
     });
 
     // Create the native chat client with performance settings pre-configured
     this.chatClient = await this.model.createChatClient({
-      args: ["--device", "cpu", "--provider", "cpu"] // Force the provider as well
+      args: ["--device", "gpu", "--provider", "gpu"] // Force the provider as well
     });
     this.chatClient.settings.temperature = 0.1; // Low for deterministic, safety-critical responses
     this._emitStatus("ready", `Model ready: ${this.modelAlias}`);

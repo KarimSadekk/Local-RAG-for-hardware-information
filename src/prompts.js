@@ -26,7 +26,8 @@ Behaviour Rules:
 
 Response Format:
 - **Summary** (1–2 lines)
-- **Safety Warnings** (if applicable)
+- **main points** (if applicable)
+- **comparison** (if applicable)
 - **Reference** (document name + section)
 
 You must only use information retrieved from the local RAG database.`;

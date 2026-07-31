@@ -95,7 +95,23 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { setupGpuDataset, semanticSearch } from './embedSearch.js';
+
+      async function initApp() {
+          // 1. Fetch your Gpu_Names.txt file
+          const response = await fetch('./Gpu_Names.txt');
+          const text = await response.text();
+          const lines = text.trim().split('\n');
+
+          // 2. Setup dataset (will generate & cache vectors on first load, load instantly after)
+          window.gpuDataset = await setupGpuDataset(lines);
+          console.log("App ready with semantic search! Total GPUs:", window.gpuDataset.length);
+      }
+
+      initApp();
+    </script>
+    <script >
       (function () {
         const chat = document.getElementById("chat");
         const input = document.getElementById("user-input");
@@ -257,6 +273,7 @@
         }
 
         function updateInitStatus(status) {
+          console.log("Received status phase:", status.phase, status); // 👈 Add this
           switch (status.phase) {
             case "download": {
               const pct =
@@ -305,18 +322,25 @@
               statusEl.textContent = "Offline Ready";
               statusEl.className = "status online";
               // Always restore the welcome message when ready
-              const welcomeMsgReady = chat.querySelector(".message.agent");
-              if (welcomeMsgReady) {
-                welcomeMsgReady.innerHTML =
-                  `<strong>Searching GPUs Agent – Ready</strong><br>` +
-                  `Running locally on this device. No internet connection required.<br><br>` +
-                  `Ask me about:<ul>` +
-                  `<li>Any GPUs</li>` +
-                  `<li>Goat of GPUs</li>` +
-                  `<li>Equipment maintenance &amp; repair steps</li>` +
-                  `<li>Best Gpu for intel and AMD processors</li>` +
-                  `<li>AMD VS NVidia</li></ul>` 
-                delete welcomeMsgReady.dataset.replaced;
+              let welcomeMsg = chat.querySelector(".message.agent");
+              if (!welcomeMsg) {
+                welcomeMsg = document.createElement("div");
+                welcomeMsg.className = "message agent";
+                chat.appendChild(welcomeMsg);
+              }
+              
+              welcomeMsg.innerHTML =
+                `<strong>Searching GPUs Agent – Ready</strong><br>` +
+                `Running locally on this device. No internet connection required.<br><br>` +
+                `Ask me about:<ul>` +
+                `<li>Any GPUs</li>` +
+                `<li>Goat of GPUs</li>` +
+                `<li>Equipment maintenance &amp; repair steps</li>` +
+                `<li>Best Gpu for intel and AMD processors</li>` +
+                `<li>AMD VS NVidia</li></ul>`;
+              
+              if (welcomeMsg.dataset.replaced) {
+                delete welcomeMsg.dataset.replaced;
               }
               break;
             case "error":
@@ -384,8 +408,23 @@
     });
 }
 
-        // Run this when the page loads
+        // Load history on page start, or default to an empty array
+      let chatHistory = JSON.parse(localStorage.getItem("localRagChatHistory")) || [];
+
+        // Call this when loading your page to restore past messages into your UI
+        function loadChatHistory() {
+            const chatBox = document.getElementById("chat"); // Update with your container ID
+            chatBox.innerHTML = ""; // Clear current view
+            
+            chatHistory.forEach(msg => {
+                // Render each saved message back into your UI
+                // appendMessageToUI(msg.role, msg.text);
+            });
+        }
+
+        // Run on load
         populateGpuDropdown();
+        loadChatHistory();
 
         quickSelect.addEventListener("change", (event) => {
         const selectedValue = event.target.value;
@@ -480,6 +519,21 @@
           if (el) el.remove();
         }
 
+        function persistHistory(){
+          localStorage.setItem("localRagChatHistory", JSON.stringify(conversationHistory));
+        }
+
+        // On page load:
+        const savedHistory = localStorage.getItem("localRagChatHistory");
+        if (savedHistory) {
+            conversationHistory = JSON.parse(savedHistory);
+            
+            // Re-render past messages into your chat container DOM
+            conversationHistory.forEach(msg => {
+                addMessage(msg.role === "user" ? "user" : "agent", msg.content);
+            });
+        }
+        
         // ── Send message ──
         async function sendMessage() {
           const text = input.value.trim();
@@ -495,7 +549,7 @@
 
           // Add to history
           conversationHistory.push({ role: "user", content: text });
-
+          persistHistory();
           try {
             const res = await fetch("/api/chat/stream", {
               method: "POST",
@@ -585,7 +639,9 @@
                 role: "assistant",
                 content: agentText,
               });
-            }
+            persistHistory();
+
+          }
           } catch (err) {
             removeTyping();
             addMessage(
