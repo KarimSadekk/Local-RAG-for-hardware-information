@@ -5,23 +5,20 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Offline](https://img.shields.io/badge/Connectivity-100%25%20Offline-brightgreen)]()
 
-# Gas Field Local RAG – Offline Support Agent
+# Searching GPUs Agent – Offline Support Agent
 
-A fully offline, on-device **Retrieval-Augmented Generation (RAG)** support agent for gas field inspection and maintenance engineers. Built with **[Foundry Local](https://foundrylocal.ai)** and **Phi-3.5 Mini Instruct**, this sample shows you how to build a production-style RAG application that runs entirely on your machine: no cloud, no API keys, no internet required.
+A fully offline, on-device **Retrieval-Augmented Generation (RAG)** support agent for gpu searches support for buyers. Built with **[Foundry Local](https://foundrylocal.ai)** and **Phi-3.5 Mini Instruct**, this sample shows you how to build a production-style RAG application that runs entirely on your machine: no cloud, no API keys, no internet required.
 
 ![Landing Page – Desktop](screenshots/01-landing-page.png)
 
 > **New to RAG?** Retrieval-Augmented Generation is a pattern where an AI model's answers are grounded in a specific set of documents. Instead of relying solely on what the model learned during training, RAG retrieves relevant chunks from your own documents and feeds them to the model as context. This dramatically reduces hallucination and makes the AI useful for domain-specific tasks.
 
-## What You'll Learn
-
-If you're a developer getting started with AI-powered applications, this project demonstrates:
+## What I learnt:
 
 1. **How RAG works end-to-end** – document ingestion, chunking, vector storage, retrieval, and generation
 2. **Running AI models locally** with [Foundry Local](https://foundrylocal.ai) (no GPU required, works on CPU/NPU)
-3. **Building a mobile-responsive web UI** that works in the field (large touch targets, high contrast, PWA-ready)
-4. **Streaming AI responses** using Server-Sent Events (SSE)
-5. **TF-IDF vector search** with SQLite: no external vector database needed
+3. **Streaming AI responses** using Server-Sent Events (SSE)
+4. **TF-IDF vector search** with SQLite: no external vector database needed
 
 ## Architecture
 
@@ -41,16 +38,16 @@ If you're a developer getting started with AI-powered applications, this project
 
 - **100% offline** – no internet, no cloud, no outbound calls
 - **Safety-first prompting** – safety warnings surface before any procedure
-- **RAG retrieval** – answers grounded in local gas engineering documents
+- **RAG retrieval** – answers grounded in local Gpu info documents
 - **Streaming responses** – real-time SSE streaming to the UI
 - **Mobile responsive** – works on phones, tablets, and desktops in the field
 - **Edge/compact mode** – toggle for extreme latency / constrained devices
 - **Document upload** – add new `.md`/`.txt` documents from the UI at runtime
 - **Field-ready UI** – high contrast, large touch targets, works with gloves/PPE
 
-| Desktop | Mobile |
-|---------|--------|
-| ![Desktop view](screenshots/01-landing-page.png) | ![Mobile view](screenshots/02-mobile-view.png) |
+| Desktop |
+|---------|
+| ![Desktop view](screenshots/01-landing-page.png) |
 
 ## Prerequisites
 
@@ -73,7 +70,7 @@ cd local-rag
 # 2. Install dependencies
 npm install
 
-# 3. Ingest the 20 gas engineering documents into the local vector store
+# 3. Ingest the GPU documents into the local vector store
 npm run ingest
 
 # 4. Start the server (starts Foundry Local automatically)
@@ -97,12 +94,6 @@ Every response includes expandable source references so you can verify which doc
 
 ![Sources panel showing retrieved documents and relevance scores](screenshots/04-sources-panel.png)
 
-### Mobile Chat
-
-The UI is fully responsive: the same interface works on mobile devices with appropriately sized touch targets:
-
-![Mobile chat view](screenshots/06-mobile-chat.png)
-
 ## Uploading Documents
 
 You can expand the knowledge base without restarting the server. Click the 📄 button to open the upload modal:
@@ -120,32 +111,29 @@ Drag-and-drop or browse for `.md`/`.txt` files. They are chunked and indexed imm
 
 ```markdown
 ---
-title: My Procedure Title
-category: Inspection Procedures
-id: DOC-CUSTOM-001
+Name: GPU NAME
+category: NVidia / AMD
+Generation: Pre-Gen 7, etc...
 ---
 
-# My Procedure Title
+# Comparison
 
-## Safety Warning
-- Important safety note here.
+## main points
+- Important notes here.
 
-## Procedure
-1. Step one.
-2. Step two.
+## reference
+- added files and its associations 
 ```
 
 ## Project Structure
 
 ```
 LOCAL-RAG/
-├── docs/                     # 20 gas engineering RAG documents
-│   ├── 01-gas-leak-detection.md
-│   ├── 02-regulator-fault-low-pressure.md
-│   ├── 03-emergency-shutdown.md
-│   ├── ...
-│   └── 20-no-gas-flow-decision-tree.md
+├── docs/                     
+│   └── Gpu_flattened_data.txt
 ├── public/
+│   ├── Gpu_Names.txt
+│   ├── embedSearch.js
 │   └── index.html            # Field engineer web UI (single-file, no build step)
 ├── src/
 │   ├── chatEngine.js         # Foundry Local + RAG orchestration
@@ -257,18 +245,6 @@ For the current use case: 20 short procedural guides on constrained local hardwa
 | `GET` | `/api/docs` | List indexed documents |
 | `GET` | `/api/health` | Health check |
 
-## RAG Document Categories
-
-The 20 included documents cover:
-
-| # | Category | Documents |
-|---|----------|-----------|
-| 1 | Safety & Compliance | Emergency shutdown, PPE, confined space, hot work permits |
-| 2 | Inspection Procedures | Leak detection, pressure testing, valve inspection, pipeline integrity, pre-inspection checklist |
-| 3 | Fault Diagnosis | Regulator faults, gas detector fault codes, no-gas-flow decision tree |
-| 4 | Repair & Maintenance | Gasket replacement, cathodic protection, corrosion treatment, purging |
-| 5 | Equipment Manuals | Compressor maintenance, sensor calibration, relief valve testing, meter installation |
-
 ## Edge / Compact Mode
 
 Toggle **Edge Mode** in the UI header for constrained devices:
@@ -296,7 +272,7 @@ await model.load();
 // Create a chat client and start generating
 const chatClient = model.createChatClient();
 const response = await chatClient.completeChat([
-  { role: "user", content: "How do I detect a gas leak?" }
+  { role: "user", content: "GeForce GTX 480?" }
 ]);
 console.log(response.choices[0].message.content);
 ```
