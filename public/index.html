@@ -34,7 +34,6 @@
       <button class="quick-btn" data-q="best Gpu for Intel Cpu">
         💻⚙️ best with Intel 🟦 Cpu
       </button>
-<!-- here should be the part where it is comparing between the cpus -->
       <!-- <button class="quick-btn" data-q="PPE requirements for gas field work">
         🦺 PPE Requirements
       </button>
@@ -59,18 +58,11 @@
       </div>
     </div>
 
-    <div id="selectionContainer">
     <div id="main-input-container">
-    <select name="Available Gpus" id="availableGpu"  class="availablehardware">
+    <select name="Available Gpus" id="availableGpu">
       <option value="" disabled selected hidden >Search for a GPU from selection</option>
     </select>
 
-    <div id="main-input-container">
-    <select name="Available Cpus" id="availableCpu"  class="availablehardware">
-      <option value="" disabled selected hidden >Search for a CPU from selection</option>
-    </select>
-
-    </div>
     <!-- Bottom Row: Upload + Textarea + Send -->
     <div id="input-area">
       <button id="upload-btn" title="Upload document">📄</button>
@@ -128,7 +120,6 @@
         const compactToggle = document.getElementById("compact-mode");
         const quickBtns = document.querySelectorAll(".quick-btn"); //quick buttons -- must be changed
         const quickSelect = document.getElementById("availableGpu");
-        const quickSelectCpu = document.getElementById("availableCpu");
         let sending = false;
         let conversationHistory = [];
 
@@ -417,35 +408,6 @@
     });
 }
 
-    async function populateCpuDropdown() {
-    const selectBox = document.getElementById("availableCpu");
-    // Use the path that worked in your browser address bar
-    const response = await fetch('cpuData.txt'); 
-    
-    if (!response.ok) {
-        console.error("Fetch failed. Check your path. Status:", response.status);
-        return;
-    }
-
-    const data = await response.text();
-    
-    // CRITICAL: Check if we accidentally fetched HTML
-    if (data.trim().startsWith('<!doctype')) {
-        console.error("Error: Fetched HTML instead of text. The path is still wrong.");
-        return;
-    }
-
-    const lines = data.trim().split('\n');
-    lines.forEach(line => {
-        if (line.trim()) {
-            const cpu = JSON.parse(line);
-            const option = document.createElement("option");
-            option.value = cpu.text;
-            option.textContent = cpu.text;
-            selectBox.appendChild(option);
-        }
-    });
-}
         // Load history on page start, or default to an empty array
       let chatHistory = JSON.parse(localStorage.getItem("localRagChatHistory")) || [];
 
@@ -462,7 +424,6 @@
 
         // Run on load
         populateGpuDropdown();
-        populateCpuDropdown();
         loadChatHistory();
 
         quickSelect.addEventListener("change", (event) => {
